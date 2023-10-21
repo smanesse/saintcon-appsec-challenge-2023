@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block body %}
+<div>
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        <form class="p-2 rounded-bottom" action="/users" method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">New Password</label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+
+            <div class="mb-3">
+                <label for="passwordConfirm" class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm">
+            </div>
+            <div class="mb-3">
+                <label for="currentPassword" class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="currentPassword" name="currentPassword">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitButton">Submit changes</button>
+
+            <!-- 
+                TODO: If any of the input fields have changes prompt before leaving "Discard Changes?"
+            -->
+            <a class="nav-link" href="/profile" style="width: fit-content; float:right;">Cancel</a>
+
+        </form>
+
+
+    </div>
+    <script>
+        function updateProfile(e) {
+            const username = document.querySelector("#username").value;
+            let user = {};
+            user['username'] = document.querySelector("#username").value;
+            user['name'] = document.querySelector("#name").value;
+            user['password'] = document.querySelector("#password").value;
+            user['confirmPassword'] = document.querySelector("#password2").value;
+        }
+    </script>
+</div>
+{% endblock %}

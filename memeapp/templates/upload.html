@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dank Memes{% endblock %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <form class="p-2 rounded-bottom" action="/upload" method="POST" enctype=multipart/form-data>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="meme" class="form-label">Upload your meme:</label>
+                        <input class="form-control" type="file" id="meme" name="file">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+        <div class="col-3"></div>
+    </div>
+</div>
+{% endblock %}

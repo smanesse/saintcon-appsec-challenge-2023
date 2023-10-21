@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ user.name }}{% endblock %}
+{% block body %}
+
+<div>
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        <div class="mb-3">
+            <h3>Name</h3>
+            <div id="name">{{ user.name }}</div>
+        </div>
+        <div class="mb-3">
+            <h3>Username</h3>
+            <div id="username">{{ user.username }}</div>
+        </div>
+        <div class="mb-3">
+            <h3>Memes Uploaded</h3>
+            <div id="memeCount">{{ memeCount }}</div>
+        </div>
+        <div class="mb-3">
+            <h3>Comments Made</h3>
+            <div id="commentCount">{{ commentCount }}</div>
+        </div>
+    </div>
+    {% if user.id == g.user.id %}
+        <a href="/editMyProfile">Edit</a>
+    {% endif %}
+</div>
+{% endblock %}

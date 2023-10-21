@@ -1,0 +1,2 @@
+:: This file is out-of-scope for vulnerabilities. It runs the tests in docker for you.
+docker run -v "%cd%:/usr/src/app" -p 127.0.0.1:5000:5000 -it --rm appsecchallenge /bin/bash /usr/src/app/runapp.sh 1

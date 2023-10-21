@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Dank Memes{% endblock %}
+{% block body %}
+<div class="container-fluid p-5">
+    <h2>
+        {{ meme.name}}
+    </h2>
+    <p class="d-inline-flex gap-1">
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#share"
+                aria-expanded="false" aria-controls="share">
+            Share
+        </button>
+    </p>
+    <div class="collapse" id="share">
+        <div class="card card-body form-control" style="width:600px">
+            <div class="input-group">
+                <span class="input-group-text">Username</span>
+                <input type="text" class="form-control" placeholder="Username" id="username" name="username">
+                <button class="btn btn-outline-secondary" type="button" onclick="shareMeme()">Share</button>
+            </div>
+            <div class="alert alert-success d-none" role="alert" id="message">
+                Shared successfully!
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div>
+        <img src="/memes/{{meme.id}}/view" class="img-fluid">
+    </div>
+    <br/>
+    <br/>
+    <h2>Comments</h2>
+    <hr/>
+    <div>
+        <div class="card card-body form-control" style="width:600px">
+            <div class="input-group">
+                <span class="input-group-text">Title</span>
+                <input type="text" class="form-control" placeholder="Title" id="title" name="title">
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Comment</span>
+                <textarea class="form-control" placeholder="Comment" id="body" name="body"></textarea>
+            </div>
+            <button class="btn btn-outline-secondary" type="button" onclick="submitComment()">Submit</button>
+        </div>
+    </div>
+    <div id="comments">
+    </div>
+    <script>
+        function shareMeme(e) {
+            const username = document.querySelector("#username").value;
+
+            fetch("/memes/{{meme.id}}/shares", {
+                method: "POST",
+                mode: "cors",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({"username": username}),
+            }).then(p => document.querySelector("#message").classList.remove("d-none"));
+        }
+
+        function getComments() {
+            const commentsDiv = document.querySelector("#comments");
+            commentsDiv.innerHTML = "";
+            fetch("/memes/{{meme.id}}/comments", {
+                method: "GET",
+                mode: "cors",
+                credentials: "same-origin"
+            }).then(p => p.json()).then((j) => {
+                for (const comment of j['comments']) {
+                    let div = document.createElement("div");
+                    let h = document.createElement("h3");
+                    let p = document.createElement("p");
+                    div.classList.add("m-5");
+                    div.classList.add("p-5");
+                    div.classList.add("border");
+                    h.innerHTML = `${comment["title"]} - <small class="text-muted"><a href="/users/${comment["author"]["id"]}">${comment["author"]["username"]}</a></small>`;
+                    p.innerHTML = comment["body"];
+                    div.appendChild(h);
+                    div.appendChild(p);
+                    commentsDiv.appendChild(div);
+                }
+            });
+        }
+
+        function submitComment(e) {
+            const title = document.querySelector("#title").value;
+            const body = document.querySelector("#body").value;
+
+            fetch("/memes/{{meme.id}}/comments", {
+                method: "POST",
+                mode: "cors",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({"title": title, "body":body}),
+            }).then(p => getComments());
+        }
+
+        getComments();
+    </script>
+</div>
+{% endblock %}

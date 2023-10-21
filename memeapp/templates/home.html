@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row row-cols-4">
+        {% for meme in memes %}
+        <div class="card col m-3 p-1" style="width: 18rem;">
+            <img src="/memes/{{meme.id}}/view" class="card-img-top" alt="{{meme.name}}">
+            <div class="card-body">
+                <a class="card-text btn stretched-link" href="/memes/{{meme.id}}">{{meme.name}}</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

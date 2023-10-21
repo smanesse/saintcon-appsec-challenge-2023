@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/loading.css') }}">
+    <script src= "{{ url_for('static',filename='js/loading.js') }}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    {% block menu %}
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/">Dank Memes</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="/home">My Memes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/shared">Shared With Me</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/upload">Upload Meme</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    {{ g.user.username }}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="/logout">Log out</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <form class="d-flex" role="search">
+                            <input class="form-control me-2" id="search" name="search" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    {% endblock %}
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            {% if errors %}
+                <div class="alert alert-danger" role="alert">
+                    <ul class="error">
+                        {% for error in errors %}
+                            <li>{{error}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if warnings %}
+                <div class="alert alert-warning" role="alert">
+                    <ul class="warning">
+                        {% for warning in warnings %}
+                            <li>{{warning}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if infos %}
+                <div class="alert alert-info" role="alert">
+                    <ul class="info">
+                        {% for info in infos %}
+                            <li>{{info}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if successes %}
+                <div class="alert alert-primary" role="alert">
+                    <ul class="success">
+                        {% for success in successes %}
+                            <li>{{success}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% block body %}
+            {% endblock %}
+        </div>
+        <div class="col-1">
+        </div>
+    </div>
+</div>
+
+<div name="loading" id="loading" class="outPopUp hideLoading">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div></div>
+<script>
+    hideLoading()
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</body>
+</html>

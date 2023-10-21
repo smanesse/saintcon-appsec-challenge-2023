@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Dank Memes{% endblock %}
+{% block body %}
+<div class="container-fluid p-5">
+    <h2>
+        Admin panel
+    </h2>
+    <h2>Settings</h2>
+    <hr/>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for name, value in settings.items() %}
+        <tr>
+            <th>{{ name }}</th>
+            <th>{{ value }}</th>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h2>Environment variables</h2>
+    <hr/>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for name, value in environ.items() %}
+        <tr>
+            <th>{{ name }}</th>
+            <th>{{ value }}</th>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

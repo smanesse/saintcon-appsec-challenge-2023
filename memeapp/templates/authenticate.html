@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dank Memes Application{% endblock %}
+{% block menu %} <br/><br/>{% endblock %}
+{% block body %}
+<p>Welcome to the Dank Memes application! If you want to do meme, be dank.</p>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button"
+                role="tab" aria-controls="home-tab-pane" aria-selected="true">Sign Up
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button"
+                role="tab" aria-controls="profile-tab-pane" aria-selected="false">Log In
+        </button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        <form class="p-2 rounded-bottom" action="/users" method="POST">
+            <div class="mb-3">
+                <label for="signupName" class="form-label required">Name</label>
+                <input type="text" class="form-control" id="signupName" name="name">
+            </div>
+            <div class="mb-3">
+                <label for="signupUsername" class="form-label required">Username</label>
+                <input type="text" class="form-control" id="signupUsername" name="username">
+            </div>
+            <div class="mb-3">
+                <label for="signupPassword" class="form-label required">Password</label>
+                <input type="password" class="form-control" id="signupPassword" name="password">
+            </div>
+            <div class="mb-3">
+                <label for="signupPassword2" class="form-label required">Confirm Password</label>
+                <input type="password" class="form-control" id="signupPassword2" name="passwordConfirm">
+            </div>
+            <button type="submit" class="btn btn-primary" onClick="showLoading()">Create Account</button>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="1">
+        <form class="p-2 rounded-bottom" action="/login" method="POST">
+            <div class="mb-3">
+                <label for="loginUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="loginUsername" name="username">
+            </div>
+            <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary" onClick="showLoading()">Log In</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
