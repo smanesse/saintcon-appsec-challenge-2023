@@ -63,7 +63,7 @@ def create_edit_user():
             errors.append("Please enter your current password")
         else:
             #TODO: this is a copy and paste of the login related code with minor differences (no user_id here).  we should look for a way to unify them
-            user = db_query(f"SELECT password_hash FROM users WHERE username='{g.user.username}'", one=True)
+            user = db_query(f"SELECT password_hash FROM users WHERE username=?", (g.user.username,), one=True)
             if user:
                 password_hash = user[0]
                 if not cryptoutils.check_password(currentPassword, password_hash):
