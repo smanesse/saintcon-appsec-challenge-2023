@@ -17,7 +17,7 @@ def get_driver():
     Chrome options for headless browser is enabled.
     See https://nander.cc/using-selenium-within-a-docker-container
     """
-    service = Service(executable_path="/usr/local/bin/chromedriver")
+    service = Service(executable_path="/usr/bin/chromedriver")
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")

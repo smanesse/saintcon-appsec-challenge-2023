@@ -1,3 +1,4 @@
+# Do not make additions to this file - all vulnerabilities can be fixed without new libraries
 attrs==22.2.0
 bcrypt==4.0.1
 click==8.1.3

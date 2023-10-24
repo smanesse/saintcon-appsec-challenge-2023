@@ -69,7 +69,7 @@ class TestMemes:
 
     def test_import_meme(self, client):
         driver = self.get_driver()
-        driver.get("http://appsec.saintcon.community/meme.html")
+        driver.get("https://appsec.saintcon.community/meme.html")
         driver.save_screenshot("/tmp/out.png")
         driver.close()
         client.post("/login", data={"username": u1, "password": p1})
