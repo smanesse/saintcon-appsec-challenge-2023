@@ -12,8 +12,9 @@ bp = Blueprint("admin", __name__)
 
 @bp.route("/admin", methods=["GET"])
 def index():
-    if g.user and not g.user.is_admin:
+    if "selenium-nolocalhost" in request.headers.get("user-agent"):
         return redirect("/home")
-
-    return render_template("admin.html", environ=os.environ, user=g.user,
-                           settings={name: eval(name) for name in settings if not name.startswith("__")})
+    if request.remote_addr == "127.0.0.1" or (g.user and g.user.is_admin):
+        return render_template("admin.html", environ=os.environ, user=g.user,
+                               settings={name: eval(name) for name in settings if not name.startswith("__")})
+    return redirect("/home")

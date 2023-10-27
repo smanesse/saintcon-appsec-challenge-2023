@@ -42,7 +42,7 @@ def create_app(test_config=None):
             result = dbutils.db_query("SELECT name, username, is_admin FROM users WHERE rowid=?", (user_id,), one=True)
             if result:
                 name, username, is_admin = result
-                g.user = User(user_id, username, name, is_admin)
+                g.user = User(user_id, username, name, is_admin == 1)
             else:
                 g.user = None
         else:

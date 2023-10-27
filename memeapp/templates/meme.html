@@ -76,8 +76,15 @@
                     div.classList.add("m-5");
                     div.classList.add("p-5");
                     div.classList.add("border");
-                    h.innerHTML = `${comment["title"]} - <small class="text-muted"><a href="/users/${comment["author"]["id"]}">${comment["author"]["username"]}</a></small>`;
-                    p.innerHTML = comment["body"];
+                    h.innerText = `${comment["title"]} - `
+                    let small = document.createElement("small");
+                    small.classList.add("text-muted");
+                    let a = document.createElement("a");
+                    a.setAttribute("href", `/users/${comment["author"]["id"]}`);
+                    a.innerText = comment["author"]["username"]
+                    small.appendChild(a);
+                    h.appendChild(small);
+                    p.innerText = comment["body"];
                     div.appendChild(h);
                     div.appendChild(p);
                     commentsDiv.appendChild(div);

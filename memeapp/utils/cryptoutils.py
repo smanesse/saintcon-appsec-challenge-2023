@@ -2,7 +2,7 @@ import bcrypt
 from hashlib import sha256
 from datetime import datetime, timedelta
 from memeapp.conf import config
-import pickle
+import json
 import base64
 from dataclasses import dataclass
 
@@ -14,6 +14,14 @@ class Session:
     timestamp: int
     user_id: int
     signature: str
+
+    def to_json(self):
+        return json.dumps({"timestamp": self.timestamp, "user_id": self.user_id, "signature": self.signature})
+
+    @staticmethod
+    def from_json(j):
+        j = json.loads(j)
+        return Session(j['timestamp'], j['user_id'], j['signature'])
 
 
 def hash_password(raw_password: str):
@@ -36,16 +44,20 @@ def sign(val: str) -> str:
     return sha256((val + config.SECRET_KEY).encode("utf-8")).hexdigest()
 
 
+def hash(val: str) -> str:
+    return sha256(val.encode("utf-8")).hexdigest()
+
+
 def get_session_token(user_id: int, ts: int = int(datetime.utcnow().timestamp())) -> str:
     assertion = f"{user_id}-{ts}"
     signature = sign(assertion)
     session = Session(ts, user_id, signature)
-    return base64.b64encode(pickle.dumps(session)).decode().strip()
+    return base64.b64encode(session.to_json().encode()).decode().strip()
 
 
 def get_session_from_token(token) -> Session:
     decoded = base64.b64decode(token.encode())
-    return pickle.loads(decoded)
+    return Session.from_json(decoded)
 
 
 def verify_session_token(request) -> bool:
@@ -69,9 +81,9 @@ def get_verified_user_id_from_request(request) -> int:
     if not verify_session_token(request):
         return -1
 
-    token = request.headers.get("Authorization")
+    token = request.cookies.get(SESSION_TOKEN_NAME)
     if not token:
-        token = request.cookies.get(SESSION_TOKEN_NAME)
+        token = request.headers.get("Authorization")
 
     user_id = get_session_from_token(token).user_id
 

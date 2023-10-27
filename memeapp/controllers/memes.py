@@ -2,9 +2,9 @@ from flask import g, render_template, request, redirect, Response, send_file, Bl
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-import json
 
 from memeapp.utils.dbutils import db_query, db_execute, get_user_id_by_username
+from memeapp.utils import cryptoutils
 from memeapp.controllers.users import login_required
 from memeapp.model import Meme
 import os
@@ -22,6 +22,7 @@ def get_driver():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument(f'--user-agent=selenium-nolocalhost')
     # chrome_options.experimental_options["prefs"] = chrome_prefs
     # chrome_prefs["profile.default_content_settings"] = {"images": 2}
     return webdriver.Chrome(options=chrome_options, service=service)
@@ -32,7 +33,7 @@ def save_meme(file, name):
     if "." in file.filename and len(ext) < 6 and not name.endswith(ext):
         name += "." + ext
     file_id = db_execute("INSERT INTO memes(name, owner) VALUES (?, ?)", (name, g.user.id))
-    path = os.path.join(current_app.config['UPLOAD_DIRECTORY'], name)
+    path = os.path.join(current_app.config['UPLOAD_DIRECTORY'], f"{file_id}-{cryptoutils.hash(name)}")
     if not os.path.exists(path):
         file.save(path)
     return file_id
@@ -62,12 +63,14 @@ def upload_meme():
 def import_meme():
     url = request.form.get("url")
     name = request.form.get("name")
+    if url.lower().startswith("file"):
+        return redirect("/upload")
     if not name.endswith(".png"):
         name = name + ".png"
     driver = get_driver()
     driver.get(url)
     file_id = db_execute("INSERT INTO memes(name, owner) VALUES (?, ?)", (name, g.user.id))
-    driver.save_screenshot(os.path.join(current_app.config['UPLOAD_DIRECTORY'], name))
+    driver.save_screenshot(os.path.join(current_app.config['UPLOAD_DIRECTORY'], f"{file_id}-{cryptoutils.hash(name)}"))
     return redirect(f"/memes/{file_id}")
 
 
@@ -88,10 +91,12 @@ def get_meme(meme_id):
     name, u = result
     shared = map(lambda x: x[0], db_query("SELECT user FROM meme_shares WHERE meme=?", (meme_id,), one=False))
     valid_users = {u, *shared}
-    if u not in valid_users:
+    if g.user.id not in valid_users:
         return Response("Not Found", status=404)
-    return send_file(os.path.join(current_app.config['UPLOAD_DIRECTORY'], name),
-                     mimetype=get_mimetype(name))
+    path = os.path.join(current_app.config['UPLOAD_DIRECTORY'], f"{meme_id}-{cryptoutils.hash(name)}")
+    if os.path.exists(path):
+        return send_file(path, mimetype=get_mimetype(name), as_attachment=True)
+    return Response("Not Found", status=404)
 
 
 @bp.route("/memes/<meme_id>", methods=["GET"])
@@ -117,7 +122,7 @@ def share_meme(meme_id):
     name, owner_id = result
     if owner_id != g.user.id:
         return Response("Not Found", status=404)
-    data = json.loads(request.data.decode("UTF-8"))
+    data = request.json
     if 'username' not in data:
         return Response("Bad Request", status=400)
     username = data['username']

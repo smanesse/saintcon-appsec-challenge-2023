@@ -12,7 +12,7 @@ def login():
         return redirect("/")
     username = request.form.get("username", None)
     password = request.form.get("password", None)
-    user = db_query(f"SELECT rowid, password_hash FROM users WHERE username='{username}'", one=True)
+    user = db_query("SELECT rowid, password_hash FROM users WHERE username=?", (username,), one=True)
     if user:
         user_id = user[0]
         password_hash = user[1]
@@ -28,10 +28,11 @@ def login():
 
 @bp.route("/logout", methods=["GET"])
 def logout():
-    response = redirect("/") #TODO: target the sign in form rather than the sign up form
+    response = redirect("/")  # TODO: target the sign in form rather than the sign up form
     clear_session_token(response)
     g.user = None
     return response
+
 
 @bp.route("/users", methods=["GET", "POST"])
 def create_edit_user():
@@ -40,14 +41,14 @@ def create_edit_user():
     infos = []
     successes = []
 
-    username = request.form.get("username", None) #used for create, but not edit
+    username = request.form.get("username", None)  # used for create, but not edit
     name = request.form.get("name", None)
     password = request.form.get("password", None)
     passwordConfirm = request.form.get("passwordConfirm", None)
-    currentPassword = request.form.get("currentPassword", None) #used for create, but not edit
+    currentPassword = request.form.get("currentPassword", None)  # used for create, but not edit
 
     is_admin = int(request.form.get("a", 0))
-    if is_admin > 0:
+    if is_admin:
         if not g.user or not g.user.is_admin:
             is_admin = 0
 
@@ -58,12 +59,12 @@ def create_edit_user():
         errors.append("Name is required")
 
     if editing:
-        #Current password is required in order to change any information
+        # Current password is required in order to change any information
         if currentPassword == None or currentPassword == "":
             errors.append("Please enter your current password")
         else:
-            #TODO: this is a copy and paste of the login related code with minor differences (no user_id here).  we should look for a way to unify them
-            user = db_query(f"SELECT password_hash FROM users WHERE username=?", (g.user.username,), one=True)
+            # TODO: this is a copy and paste of the login related code with minor differences (no user_id here).  we should look for a way to unify them
+            user = db_query(f"SELECT password_hash FROM users WHERE username='{g.user.username}'", one=True)
             if user:
                 password_hash = user[0]
                 if not cryptoutils.check_password(currentPassword, password_hash):
@@ -90,14 +91,15 @@ def create_edit_user():
             if password:
                 pw_hash = cryptoutils.hash_password(password).decode("utf-8")
             else:
-                pw_hash = None #Don't reset the password, let the COALESCE keep the password the same when they have only changes non-password related fields
+                pw_hash = None  # Don't reset the password, let the COALESCE keep the password the same when they have only changes non-password related fields
             print("Attempting to update the user", name, pw_hash, g.user.id)
-            db_execute("UPDATE users SET name = COALESCE(?, name), password_hash = COALESCE(?, password_hash) WHERE rowid=?",
-                                p=(name, pw_hash, g.user.id))
+            db_execute(
+                "UPDATE users SET name = COALESCE(?, name), password_hash = COALESCE(?, password_hash) WHERE rowid=?",
+                p=(name, pw_hash, g.user.id))
             successes.append("User updated")
-            #update the user visible fields
-            g.user.name = name 
-        else:  #Create the user
+            # update the user visible fields
+            g.user.name = name
+        else:  # Create the user
             print("Attempting to create the user")
             if isExistingUser(username):
                 errors.append(f"Username '{username}' is not available")
@@ -111,13 +113,16 @@ def create_edit_user():
                 return response
     if g.user:
         # TODO: return in a way that keeps form fields populated, rather than resets them
-        return render_template("profile/editProfile.html", user=g.user, errors=errors, warnings=warnings, infos=infos, successes=successes)
+        return render_template("profile/editProfile.html", user=g.user, errors=errors, warnings=warnings, infos=infos,
+                               successes=successes)
     else:
         return render_template("authenticate.html", errors=errors, warnings=warnings, infos=infos, successes=successes)
+
 
 def isExistingUser(userName):
     existing_user = db_query("SELECT username FROM users WHERE username=?", p=(userName,), one=True)
     return not not existing_user
+
 
 @bp.route("/users/<user_id>", methods=['GET'])
 @login_required
@@ -130,5 +135,6 @@ def get_user(user_id=0):
         memeCount = db_query("SELECT count(*) AS c FROM memes WHERE owner=?", (user_id,), True)
         commentCount = db_query("SELECT count(*) AS c FROM comments WHERE author=?", (user_id,), True)
 
-        return render_template("profile/viewProfile.html", user=user_record, memeCount=memeCount[0], commentCount=commentCount[0])
+        return render_template("profile/viewProfile.html", user=user_record, memeCount=memeCount[0],
+                               commentCount=commentCount[0])
     return Response("Not found", 404)
